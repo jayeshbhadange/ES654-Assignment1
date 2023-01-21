@@ -63,4 +63,4 @@ def information_gain(Y: pd.Series, attr: pd.Series) -> float:
 
     for val in lab.values():
       ent_Y-=(len(val)/length)*entropy(pd.Series(val))
-    return ent_Y  
+    return float(ent_Y ) 
