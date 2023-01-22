@@ -12,7 +12,7 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from tree.utils import entropy, information_gain, gini_index
+from utils import entropy, information_gain, gini_index
 
 np.random.seed(42)
 
@@ -127,8 +127,11 @@ class DecisionTree:
             for j in range(att.shape[0]-1):
               split=(att[j]+att[j+1])/2
               left= ([y[k] for k in range(y.size) if att[k]<=split])
+              left=np.asarray(left)
+
               right = ([y[k] for k in range(y.size) if att[k]>split])
-              err=np.square(np.mean(left)-left) + np.square(np.mean(right)-right)
+              right=np.asarray(right)
+              err=np.sum(np.square(np.mean(left)-left)) + np.sum(np.square(np.mean(right)-right))
               if(err<maxEntReal):
                 maxEntReal=err
                 best_attribute=i
@@ -228,3 +231,4 @@ class DecisionTree:
         """
         head=self.root
         self.plot_tree(head,0)
+        
