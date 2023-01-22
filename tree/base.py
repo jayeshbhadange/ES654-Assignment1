@@ -12,7 +12,7 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from utils import entropy, information_gain, gini_index
+from tree.utils import entropy, information_gain, gini_index
 
 np.random.seed(42)
 
