@@ -1,5 +1,6 @@
 from typing import Union
 import pandas as pd
+import numpy as np
 
 
 def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
@@ -40,7 +41,7 @@ def recall(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
     y_hat=y_hat.to_numpy()
     y=y.to_numpy()
     tp = np.sum((y == cls) & (y_hat == cls))
-    fn = np.sum((y = cls) & (y_hat != cls))
+    fn = np.sum((y == cls) & (y_hat != cls))
     return float(tp / (tp + fn))
     
 
@@ -65,4 +66,5 @@ def mae(y_hat: pd.Series, y: pd.Series) -> float:
     y=y.to_numpy()
     err=(np.mean(abs(y_hat-y)))
     return err
+
     
