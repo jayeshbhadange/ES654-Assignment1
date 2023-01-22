@@ -126,10 +126,17 @@ class DecisionTree:
             att=att.sort_values(ascending=True)
             for j in range(att.shape[0]-1):
               split=(att[j]+att[j+1])/2
-              left= ([y[k] for k in range(y.size) if att[k]<=split])
+              left=[]
+              right=[]
+              for k in range(y.size):
+                if att[k]<=split:
+                  left.append(y[k])
+              #left= ([y[k] for k in range(y.size) if att[k]<=split])
               left=np.asarray(left)
-
-              right = ([y[k] for k in range(y.size) if att[k]>split])
+              for k in range(y.size):
+                if att[k]>split:
+                  right.append(y[k])
+              #right = ([y[k] for k in range(y.size) if att[k]>split])
               right=np.asarray(right)
               err=np.sum(np.square(np.mean(left)-left)) + np.sum(np.square(np.mean(right)-right))
               if(err<maxEntReal):
@@ -231,4 +238,3 @@ class DecisionTree:
         """
         head=self.root
         self.plot_tree(head,0)
-        
