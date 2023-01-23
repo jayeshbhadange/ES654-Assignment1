@@ -22,7 +22,7 @@ for i in data.columns:
     data[i] = data[i].astype('float64')
 data.reset_index(drop = True,inplace = True)
 
-X_train, X_test, y_train, y_test = data.iloc[:n,1:], data.iloc[n+1:,1:], data.iloc[:n,0], data.iloc[n+1:,0]
+X_train, X_test, y_train, y_test = train_test_split(data.iloc[:,1:], data.iloc[:,0], test_size=0.3, random_state=0)
 print("\nOur implementation of Decision Tree\n")
 for criteria in ['information_gain','gini_index']:
     print("criteria: ", criteria)
