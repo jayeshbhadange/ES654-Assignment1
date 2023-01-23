@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +15,7 @@ np.random.seed(42)
 # Read dataset
 data = pd.read_fwf('auto-mpg.data',names = ["mpg", "cylinders", "displacement", "horsepower", "weight", "accelaration", "model year", "origin", "car name"])
 # we don't need the string columns in our model
-data.drop('car name',axis = 1,inplace = True)
+data.drop('car name',axis = 'columns',inplace = True)
 # removing the unknown data points
 data.drop(data.index[data['horsepower']=='?'],inplace = True)
 
@@ -43,5 +44,5 @@ Tree_text = tree.export_text(sk_tree)
 print(Tree_text)
 y_sk_predict = sk_tree.predict(X_test)
 y_sk_predict = pd.Series(y_sk_predict)
-print('RMSE between our model and Decision tree module from sklearn : ', rmse(y_sk_predict, y_test))
-print('MAE between our model and Decision tree module from sklearn : ', mae(y_sk_predict, y_test))
+print('RMSE between our model and Decision tree module from sklearn : ', rmse(y_sk_predict, y_predict))
+print('MAE between our model and Decision tree module from sklearn : ', mae(y_sk_predict, y_predict))
