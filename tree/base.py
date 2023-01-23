@@ -12,13 +12,13 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from utils import entropy, information_gain, gini_index
+from tree.utils import entropy, information_gain, gini_index
 
 np.random.seed(42)
 
 class Node():
     def __init__(self):
-        self.typeofatt=False         #dtrue if discrete attributeHere
+        self.typeofatt=False        #true if discrete attributeHere
         self.split_val=None         #Spliting number for Real input
         self.value=None             #Output value
         self.child={}               #child nodes           
@@ -31,19 +31,19 @@ class DecisionTree:
     root=None
     def fit_tree(self,x,y,depth):
       node=Node()
-      maxEnt = -9999999999
-      maxEntReal=9999999999
+      maxEnt = -1*float("inf")
+      maxEntReal=float("inf")
       best_attribute = -1
       splitval=None
-      y1=y.to_numpy(y)
+      y1=y.to_numpy()
       # classification if y is discrete
       if(y.dtype=="category"):
 
         clasNo=np.unique(y)
         if(clasNo.size==1): # only one value for prediction
-          node.isleaf = True
+          node.isleaf = True #predict directly
           node.typeofatt = True # for discrete attribute
-          node.value = clasNo[0]
+          node.value = np.random.choice(clasNo)
           return node
         if(self.max_depth==depth): #if max depth is reached
           node.isleaf = True
@@ -53,7 +53,7 @@ class DecisionTree:
         if(x.shape[1]==0):
           node.isleaf = True
           node.typeofatt = True
-          node.value = y.value_counts().idxmax()
+          node.value = np.bincount(y1).argmax()
           return node  
 
 
@@ -68,7 +68,7 @@ class DecisionTree:
             else:
               gain=0
               
-              y1=list(y1)
+              
               att=list(att)
               length=len(att)
               lab={}
@@ -86,6 +86,7 @@ class DecisionTree:
           else: # if real attributes
             att=att.sort_values(ascending=True)
             for j in range(att.shape[0]-1):
+              gain=None
               split=(att[j]+att[j+1])/2
               left= pd.Series([y1[k] for k in range(y1.size) if att[k]<=split])
               right = pd.Series([y1[k] for k in range(y1.size) if att[k]>split])
@@ -98,68 +99,45 @@ class DecisionTree:
                 right_entropy = entropy(right)
                 gian= initial_entropy - (left_entropy * (left.size / len(y1)) + right_entropy * (right.size / len(y1)))
               else:
-                gain = (-1/len(y1))*(left.size*gini_index(left) + right.size*gini_index(right))
-              if(gain>maxEnt):
-                maxEnt=gain
-                best_attribute=i
-                splitval=split
-
+                gain = (-1/len(y1))*((left.size*gini_index(left) + right.size*gini_index(right)))
+              if(gain!=None):
+                if(gain>maxEnt):
+                  maxEnt=gain
+                  best_attribute=i
+                  splitval=split
+              else:
+                  gain=maxEnt+10000
+                  best_attribute=i
+                  splitval=split
       else: #means regression
-        if(self.max_depth==depth):
+        if(self.max_depth==depth or y1.size==1 or x.shape[1]==0):
           node.isleaf=True
           node.value=y1.mean()
           return node
-        if(y1.size==1):
-          node.isleaf = True
-          node.value = y[0]
-          return node      
-        if(x.shape[1]==0):
-          node.isleaf = True
-          node.value = y1.mean()
-          return node
+        
         for i in x:
           att=x[i]
           if(att.dtype=="category"): # checking for discrete attributes
-              classes1 = np.unique(att)
+              uniqval = np.unique(att)
               gain=0
-              for j in classes1:
+              for j in uniqval:
                   y_sub = pd.Series([y[k] for k in range(y.size) if att[k]==j])
                   gain += y_sub.size*np.var(y_sub)
                   if(maxEntReal>gain):
                             maxEntReal = gain
                             best_attribute = i
                             splitval = None
-                  
-              """att=list(att)
-              label = {}
-              length=len(y)
-              for j in range(len(att)):
-                if att[j] in label.keys():
-                  label[att[j]].append(y1[j])
-                else:
-                  label[att[j]]=[y1[j]]
-              gain=0    
-              for val in label.values():
-                gain+=len(val)*((pd.Series(val)).var())
-              tot_var=y.var()
-              tot_var-=gain/len(y1)
-              if(tot_var>maxEnt):
-                maxEnt=tot_var
-                best_attribute=i"""
+
           else: # real input
             att=att.sort_values(ascending=True)
             for j in range(y.shape[0]-1):
               split=(att[j]+att[j+1])/2
               left=[]
               right=[]
-              """for k in range(y1.size):
-                if att[k]<=split:
-                  left.append(y1[k])"""
+              
               left= ([y[k] for k in range(y.size) if att[k]<=split])
               left=np.asarray(left)
-              """for k in range(y1.size):
-                if att[k]>split:
-                  right.append(y1[k])"""
+              
               right = ([y[k] for k in range(y.size) if att[k]>split])
               right=np.asarray(right)
               errr=np.sum(np.square(np.mean(left)-left)) + np.sum(np.square(np.mean(right)-right))
@@ -170,24 +148,15 @@ class DecisionTree:
       if(splitval==None):
         node.typeofatt=True
         node.att=best_attribute
-        print(best_attribute)
+        
         classes = np.unique(x[best_attribute])
-        print(classes)
+      
         for j in classes:
-          y_new = pd.Series([y1[k] for k in range(y1.size) if x[best_attribute][k]==j], dtype=y1.dtype)
+          y_modify = pd.Series([y1[k] for k in range(y1.size) if x[best_attribute][k]==j], dtype=y1.dtype)
           x_modify=x[x[best_attribute]==j].reset_index().drop(['index',best_attribute],axis=1) 
-          node.child[j]=self.fit_tree(x_modify, y_new, depth+1)
+          node.child[j]=self.fit_tree(x_modify, y_modify, depth+1)
 
-        #for i in x[best_attribute].unique():
-        #  val=[]
-        #  for j in range(len(x[best_attribute])):
-        #    if x[best_attribute][j]==i:
-        #      val.append(y1[j])
-        #  x_modify=x[x[best_attribute]==i].reset_index().drop(['index',best_attribute],axis=1) # modifying x 
-        #  val=pd.Series(val,dtype=y1.dtype)
-          
-        #  node.child[i]=self.fit_tree(x_modify, val, depth+1)
-
+        
       else:
         node.att=best_attribute
         node.split_val=splitval
