@@ -55,11 +55,11 @@ def information_gain(Y: pd.Series, attr: pd.Series) -> float:
     length=len(Y)
     att=list(attr)
     lab={}
-    for i in att:
-      if i in lab:
-        lab[i].append(Y[i])
+    for i in range(len(att)):
+      if att[i] in lab.keys():
+        lab[att[i]].append(Y[i])
       else:
-        lab[i]=[Y[i]]
+        lab[att[i]]=[Y[i]]
 
     for val in lab.values():
       ent_Y-=(len(val)/length)*entropy(pd.Series(val))
