@@ -1,7 +1,0 @@
-M is the number of features
-N is the number of samples
-d is depth of the tree
-The Theoretical time complexity for learning a decision tree is typically O(MNlog(N)).
-This is because the algorithm must iterate through all samples and features to find the optimal split at each node of the tree. 
-The Theoretical time complexity for prediction with a decision tree is O(d), as the algorithm must traverse the tree to reach a leaf node.
-The depth of the tree is logarithmic in the number of samples time complexity for prediction becomes O(log(N))
