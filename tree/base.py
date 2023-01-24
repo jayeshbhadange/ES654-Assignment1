@@ -45,18 +45,11 @@ class DecisionTree:
           node.typeofatt = True # for discrete attribute
           node.value = np.random.choice(clasNo)
           return node
-        if(self.max_depth==depth): #if max depth is reached
+        if(self.max_depth==depth or x.shape[1]==0): #if max depth is reached
           node.isleaf = True
           node.typeofatt = True
           node.value = np.bincount(y1).argmax()
           return node
-        if(x.shape[1]==0):
-          node.isleaf = True
-          node.typeofatt = True
-          node.value = np.bincount(y1).argmax()
-          return node  
-
-
         
         for i in x:
           att=x[i]
