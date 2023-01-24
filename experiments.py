@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import time
 import matplotlib.pyplot as plt
-from tree.base import DecisionTree
-from metrics import *
+import seaborn as sns
+#from tree.base import DecisionTree
+#from metrics import *
 
 np.random.seed(42)
 num_average_time = 100
@@ -37,10 +38,11 @@ def learndata(N,M,category): # create fake dataset for four cases
 
 def caltime(category):
   np.random.seed(42)
-  N = np.random.randint(1,150,size=8)
-  M = np.random.randint(1,50,size=5)
-  fittime=[]
-  predtime=[]
+  N = np.random.randint(1,150,size=3)
+  M = np.random.randint(1,50,size=3)
+
+  d={}
+  p={}
   for n in N:
     for m in M:
       X,y=learndata(n,m,category)
@@ -52,12 +54,40 @@ def caltime(category):
         st2=time.time()
         Dtree.predict(X)
         en2=time.time()
-        fittime.append((n,m,end-start))
-        predtime.append((n,m,en2-st2))
-  fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-  axs[0].scatter(*zip(*fittime))
-  axs[0].set_title("Fit time")
-  axs[1].scatter(*zip(*predtime))
-  axs[1].set_title("Predict time")
-  plt.show()
-caltime("DisDis")
+        if m in d.keys():
+          d[m].append((n,end-start))
+        else:
+          d[m]=[(n,end-start)]  
+        if m in p.keys():
+          p[m].append((n,en2-st2))
+        else:
+          p[m]=[(n,en2-st2)]        
+
+
+  fig,ax=plt.subplots(1,len(d))  
+  j=0
+  for i in d.keys():
+    x,y=zip(*d[i]) 
+    ax[j].plot(x,y)
+    ax[j].set_xlabel(f"N at attributes={i}")
+    ax[j].set_ylabel("time")
+    j+=1
+  plt.subplots_adjust(wspace=4,hspace=4)
+  fig.suptitle(f"{category}, fit time")
+  plt.show()    
+  fig,ax=plt.subplots(1,len(p))  
+  j=0
+  for i in p.keys():
+    x,y=zip(*p[i]) 
+    ax[j].plot(x,y)
+    ax[j].set_xlabel(f"N at attributes={i}")
+    ax[j].set_ylabel("time")    
+    j+=1
+  plt.subplots_adjust(wspace=4,hspace=4)
+  fig.suptitle(f"{category}, prediction time")
+  plt.show()      
+  
+#caltime("DisDis")
+#caltime("ReDis")
+caltime("DisRe")
+#caltime("ReRe")
