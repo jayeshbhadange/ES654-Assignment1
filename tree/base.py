@@ -90,7 +90,7 @@ class DecisionTree:
                 
                 left_entropy = entropy(left)
                 right_entropy = entropy(right)
-                gian= initial_entropy - (left_entropy * (left.size / len(y1)) + right_entropy * (right.size / len(y1)))
+                gain= initial_entropy - (left_entropy * (left.size / len(y1)) + right_entropy * (right.size / len(y1)))
               else:
                 gain = (-1/len(y1))*((left.size*gini_index(left) + right.size*gini_index(right)))
               if(gain!=None):
