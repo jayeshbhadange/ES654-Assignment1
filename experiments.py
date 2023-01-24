@@ -4,8 +4,8 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
-#from tree.base import DecisionTree
-#from metrics import *
+from tree.base import DecisionTree
+from metrics import *
 
 np.random.seed(42)
 num_average_time = 100
